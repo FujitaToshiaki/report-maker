@@ -149,13 +149,17 @@ export async function generateChatResponse(request: ChatRequest): Promise<string
     throw new Error(`Unknown character: ${characterId}`);
   }
 
+  // Trim message history to prevent token overflow
+  // Keep only the last 10 messages (5 exchanges) to stay within token limits
+  const trimmedMessages = messages.slice(-10);
+
   // Build messages array with system prompt
   const chatMessages: ChatMessage[] = [
     {
       role: "system",
       content: character.systemPrompt
     },
-    ...messages
+    ...trimmedMessages
   ];
 
   try {

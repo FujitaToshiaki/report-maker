@@ -10,7 +10,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { messages, characterId, reportType } = req.body;
 
       if (!messages || !characterId) {
-        return res.status(400).json({ error: "Missing required fields" });
+        return res.status(400).json({ error: "必須フィールドが不足しています" });
       }
 
       const response = await generateChatResponse({
@@ -22,7 +22,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: response });
     } catch (error) {
       console.error("Chat API error:", error);
-      res.status(500).json({ error: "Failed to generate response" });
+      
+      // Extract user-friendly error message if available
+      if (error instanceof Error) {
+        // Return specific error messages from the chat service
+        if (error.message.includes("トークン制限") || error.message.includes("AIからの応答")) {
+          return res.status(400).json({ error: error.message });
+        }
+      }
+      
+      res.status(500).json({ error: "応答の生成に失敗しました。もう一度お試しください。" });
     }
   });
 
