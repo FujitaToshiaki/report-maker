@@ -5,40 +5,40 @@ import { CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 import { useLocation } from "wouter";
 import masuoAvatar from "@assets/stock_images/friendly_mature_japa_e8e63f4f.jpg";
-import ayaAvatar from "@assets/stock_images/young_japanese_woman_c4b45ecb.jpg";
-import kenjiAvatar from "@assets/stock_images/japanese_business_ma_e2c8ac52.jpg";
+import yumiAvatar from "@assets/stock_images/young_japanese_woman_c4b45ecb.jpg";
+import takashiAvatar from "@assets/stock_images/japanese_business_ma_e2c8ac52.jpg";
 
 const characters = [
   {
-    id: "masuo",
-    name: "ますお兄さん",
-    role: "50代ベテラン営業マン",
+    id: "masaru",
+    name: "まさる課長",
+    role: "50代品質管理ベテラン",
     avatar: masuoAvatar,
-    description: "温厚で聞き上手な経験豊富なインタビュアー",
-    sample: "「そんがんこつはどうやったがけ？」",
-    color: "border-chart-3",
-  },
-  {
-    id: "aya",
-    name: "あやちゃん",
-    role: "20代若手企画職",
-    avatar: ayaAvatar,
-    description: "明るく好奇心旺盛な掘り下げ役",
-    sample: "「それってどういうことながけ？」",
-    color: "border-pink-400",
-  },
-  {
-    id: "kenji",
-    name: "けんじ部長",
-    role: "40代管理職",
-    avatar: kenjiAvatar,
-    description: "要点を押さえる実務的な確認役",
-    sample: "「そこは大事ながいぜ」",
+    description: "冷静沈着な分析者、5Why分析の誘導役",
+    sample: "「で、どんな不良やったがけ？」",
     color: "border-primary",
+  },
+  {
+    id: "yumi",
+    name: "ゆみ主任",
+    role: "30代現場リーダー",
+    avatar: yumiAvatar,
+    description: "現場感覚が鋭い実務的な確認役",
+    sample: "「いつもと何が違っとったがけ？」",
+    color: "border-chart-2",
+  },
+  {
+    id: "takashi",
+    name: "たかし技術者",
+    role: "40代設備保全担当",
+    avatar: takashiAvatar,
+    description: "技術的・データ重視の深掘り役",
+    sample: "「設備の調子はどうやった？」",
+    color: "border-chart-3",
   },
 ];
 
-export function CharacterSelection() {
+export function DefectCharacterSelection() {
   const [, setLocation] = useLocation();
   const [selected, setSelected] = useState<string | null>(null);
 
@@ -49,8 +49,8 @@ export function CharacterSelection() {
 
   const handleStart = () => {
     if (selected) {
-      console.log("Starting interview with:", selected);
-      setLocation("/trip/chat");
+      console.log("Starting defect analysis with:", selected);
+      setLocation("/defect/chat");
     }
   };
 
@@ -60,14 +60,14 @@ export function CharacterSelection() {
         {/* Progress */}
         <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
           <span className="font-medium text-primary">ステップ 2/5</span>
-          <span>インタビュアー選択</span>
+          <span>分析担当者選択</span>
         </div>
 
         {/* Header */}
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-semibold">インタビュアーを選択</h1>
+          <h1 className="text-3xl font-semibold">分析担当者を選択</h1>
           <p className="text-muted-foreground">
-            富山弁で話すキャラクターを選んでください。対話を通じて報告書を作成します。
+            富山弁で話すキャラクターを選んでください。5Why分析を通じて根本原因を特定します。
           </p>
         </div>
 
@@ -114,9 +114,9 @@ export function CharacterSelection() {
             size="lg"
             onClick={handleStart}
             disabled={!selected}
-            data-testid="button-start-interview"
+            data-testid="button-start-analysis"
           >
-            インタビューを始める
+            分析を始める
           </Button>
         </div>
       </div>

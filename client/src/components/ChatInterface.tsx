@@ -85,7 +85,7 @@ export function ChatInterface() {
 
   const handleEnd = () => {
     console.log("Ending interview...");
-    setLocation("/report-preview");
+    setLocation("/trip/preview");
   };
 
   return (

@@ -28,7 +28,7 @@ export function BasicInfoForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Form submitted:", { ...formData, startDate, endDate });
-    setLocation("/character-selection");
+    setLocation("/trip/character-selection");
   };
 
   return (
