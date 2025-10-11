@@ -18,13 +18,15 @@
 
 ### フロントエンド
 - React + TypeScript
-- Wouter (ルーティング)
+- Wouter (ルーティング) - 注意: useLocation()はpathnameのみ返すため、クエリパラメータはwindow.location.searchを使用
 - Tailwind CSS + Shadcn UI
 - TanStack Query (データフェッチング)
 
 ### バックエンド
 - Express.js
-- OpenAI API (Replit AI Integrations経由)
+- OpenAI API (ユーザー自身のOPENAI_API_KEYを使用)
+  - モデル: gpt-5 (2025年8月7日リリース)
+  - トークン管理: メッセージ履歴を最新10件に制限、max_completion_tokens=2000
 - インメモリストレージ (javascript_mem_db)
 
 ### デザイン
