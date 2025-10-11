@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 import { useLocation } from "wouter";
+import { cn } from "@/lib/utils";
 import takeshiAvatar from "@assets/stock_images/mature_japanese_trai_00e627f8.jpg";
 import sayuriAvatar from "@assets/stock_images/japanese_woman_in_he_1bb5ca4e.jpg";
 import kojiAvatar from "@assets/stock_images/young_japanese_man_f_a4b73fdf.jpg";
@@ -122,8 +123,4 @@ export function SeminarCharacterSelection() {
       </div>
     </div>
   );
-}
-
-function cn(...classes: (string | boolean | undefined)[]) {
-  return classes.filter(Boolean).join(" ");
 }
