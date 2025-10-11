@@ -1,9 +1,8 @@
 import { ChatInterface } from "@/components/ChatInterface";
-import { useLocation } from "wouter";
 
 export default function ChatPage() {
-  const [location] = useLocation();
-  const params = new URLSearchParams(location.split('?')[1]);
+  // wouter's useLocation only returns the pathname, use window.location.search for query params
+  const params = new URLSearchParams(window.location.search);
   const character = params.get('character') || 'masuo';
   const type = params.get('type') || 'trip';
 
