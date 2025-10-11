@@ -10,7 +10,7 @@ import {
   SidebarMenuItem,
   SidebarHeader,
 } from "@/components/ui/sidebar";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 
 const menuItems = [
   {
@@ -68,10 +68,10 @@ export function AppSidebar() {
                     isActive={location === item.url}
                     data-testid={`nav-${item.url.slice(1) || 'dashboard'}`}
                   >
-                    <a href={item.url}>
+                    <Link href={item.url}>
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
