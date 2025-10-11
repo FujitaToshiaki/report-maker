@@ -1,4 +1,4 @@
-import { FileText, AlertTriangle, LayoutDashboard, Settings, HelpCircle } from "lucide-react";
+import { FileText, AlertTriangle, GraduationCap, LayoutDashboard, Settings, HelpCircle } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -22,6 +22,11 @@ const menuItems = [
     title: "出張報告書",
     url: "/trip-reports",
     icon: FileText,
+  },
+  {
+    title: "セミナー参加報告書",
+    url: "/seminar-reports",
+    icon: GraduationCap,
   },
   {
     title: "不良品報告書",

@@ -19,6 +19,7 @@ import DefectCharacterPage from "@/pages/DefectCharacterPage";
 import SeminarBasicInfoPage from "@/pages/SeminarBasicInfoPage";
 import SeminarCharacterPage from "@/pages/SeminarCharacterPage";
 import TripReportsPage from "@/pages/TripReportsPage";
+import SeminarReportsPage from "@/pages/SeminarReportsPage";
 import DefectReportsPage from "@/pages/DefectReportsPage";
 import SettingsPage from "@/pages/SettingsPage";
 import HelpPage from "@/pages/HelpPage";
@@ -28,6 +29,7 @@ function Router() {
     <Switch>
       <Route path="/" component={HomePageNew} />
       <Route path="/trip-reports" component={TripReportsPage} />
+      <Route path="/seminar-reports" component={SeminarReportsPage} />
       <Route path="/defect-reports" component={DefectReportsPage} />
       <Route path="/settings" component={SettingsPage} />
       <Route path="/help" component={HelpPage} />
