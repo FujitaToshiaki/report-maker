@@ -50,7 +50,7 @@ export function DefectCharacterSelection() {
   const handleStart = () => {
     if (selected) {
       console.log("Starting defect analysis with:", selected);
-      setLocation("/defect/chat");
+      setLocation(`/defect/chat?character=${selected}&type=defect`);
     }
   };
 

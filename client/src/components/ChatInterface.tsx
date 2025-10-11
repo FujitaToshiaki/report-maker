@@ -6,7 +6,14 @@ import { Progress } from "@/components/ui/progress";
 import { Send, Save, SkipForward, X } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useLocation } from "wouter";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import masuoAvatar from "@assets/stock_images/friendly_mature_japa_e8e63f4f.jpg";
+import ayaAvatar from "@assets/stock_images/young_japanese_woman_c4b45ecb.jpg";
+import kenjiAvatar from "@assets/stock_images/japanese_business_ma_e2c8ac52.jpg";
+import yumiAvatar from "@assets/stock_images/young_japanese_woman_c4b45ecb.jpg";
+import takashiAvatar from "@assets/stock_images/japanese_business_ma_e2c8ac52.jpg";
 
 interface Message {
   id: string;
@@ -14,18 +21,62 @@ interface Message {
   content: string;
 }
 
-// Mock initial messages - todo: remove mock functionality
-const initialMessages: Message[] = [
-  {
-    id: "1",
-    role: "assistant",
-    content: "お疲れさまでした！今日の出張はどんな感じやったがけ？",
-  },
-];
+interface ChatInterfaceProps {
+  characterId: string;
+  reportType: "trip" | "defect";
+}
 
-export function ChatInterface() {
+const characterData = {
+  masuo: {
+    name: "ますお兄さん",
+    role: "ベテラン営業マン",
+    avatar: masuoAvatar,
+    initialMessage: "お疲れさまでした！今日の出張はどんな感じやったがけ？",
+  },
+  aya: {
+    name: "あやちゃん",
+    role: "若手企画職",
+    avatar: ayaAvatar,
+    initialMessage: "お疲れさまでした！出張どうやったがけ？楽しかった？",
+  },
+  kenji: {
+    name: "けんじ部長",
+    role: "管理職",
+    avatar: kenjiAvatar,
+    initialMessage: "お疲れさま。今回の出張、どうやったがけ？",
+  },
+  masaru: {
+    name: "まさる課長",
+    role: "品質管理ベテラン",
+    avatar: masuoAvatar,
+    initialMessage: "で、どんな不良やったがけ？詳しく教えてくれんけ。",
+  },
+  yumi: {
+    name: "ゆみ主任",
+    role: "現場リーダー",
+    avatar: yumiAvatar,
+    initialMessage: "不良が出たがけ？いつもと何が違っとったがけ？",
+  },
+  takashi: {
+    name: "たかし技術者",
+    role: "設備保全担当",
+    avatar: takashiAvatar,
+    initialMessage: "不良の報告やね。まず、どんな不良やったがけ？",
+  },
+};
+
+export function ChatInterface({ characterId, reportType }: ChatInterfaceProps) {
   const [, setLocation] = useLocation();
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const { toast } = useToast();
+  const character = characterData[characterId as keyof typeof characterData] || characterData.masuo;
+  
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: "1",
+      role: "assistant",
+      content: character.initialMessage,
+    },
+  ]);
   const [input, setInput] = useState("");
   const [progress, setProgress] = useState(7); // 1/15 questions
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -38,8 +89,36 @@ export function ChatInterface() {
     scrollToBottom();
   }, [messages]);
 
+  const chatMutation = useMutation({
+    mutationFn: async (userMessage: string) => {
+      const response = await apiRequest("POST", "/api/chat", {
+        messages: messages.map((m) => ({ role: m.role, content: m.content })),
+        characterId,
+        reportType,
+      });
+      return await response.json();
+    },
+    onSuccess: (data: any) => {
+      const aiMessage: Message = {
+        id: Date.now().toString(),
+        role: "assistant",
+        content: data.message,
+      };
+      setMessages((prev) => [...prev, aiMessage]);
+      setProgress((prev) => Math.min(prev + 7, 100));
+    },
+    onError: (error) => {
+      console.error("Chat error:", error);
+      toast({
+        title: "エラー",
+        description: "メッセージの送信に失敗しました。",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleSend = () => {
-    if (!input.trim()) return;
+    if (!input.trim() || chatMutation.isPending) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -49,22 +128,7 @@ export function ChatInterface() {
 
     setMessages([...messages, userMessage]);
     setInput("");
-
-    // Simulate AI response - todo: replace with actual AI integration
-    setTimeout(() => {
-      const responses = [
-        "なるほどのう！それで、一番印象に残ったことは何ながけ？",
-        "そうやったがけ。もうちょっと詳しく教えてくれんけ？",
-        "ほうほう、そんがんこつがあったがか。で、当初の目的は達成できたがけ？",
-      ];
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: responses[Math.floor(Math.random() * responses.length)],
-      };
-      setMessages((prev) => [...prev, aiMessage]);
-      setProgress((prev) => Math.min(prev + 7, 100));
-    }, 1000);
+    chatMutation.mutate(input);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -76,6 +140,10 @@ export function ChatInterface() {
 
   const handleSave = () => {
     console.log("Saving draft...");
+    toast({
+      title: "保存しました",
+      description: "下書きを保存しました。",
+    });
   };
 
   const handleSkip = () => {
@@ -85,7 +153,8 @@ export function ChatInterface() {
 
   const handleEnd = () => {
     console.log("Ending interview...");
-    setLocation("/trip/preview");
+    const previewPath = reportType === "trip" ? "/trip/preview" : "/defect/preview";
+    setLocation(previewPath);
   };
 
   return (
@@ -96,12 +165,12 @@ export function ChatInterface() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Avatar className="h-10 w-10">
-                <AvatarImage src={masuoAvatar} alt="ますお兄さん" />
-                <AvatarFallback>ま</AvatarFallback>
+                <AvatarImage src={character.avatar} alt={character.name} />
+                <AvatarFallback>{character.name[0]}</AvatarFallback>
               </Avatar>
               <div>
-                <h2 className="font-semibold">ますお兄さん</h2>
-                <p className="text-xs text-muted-foreground">ベテラン営業マン</p>
+                <h2 className="font-semibold">{character.name}</h2>
+                <p className="text-xs text-muted-foreground">{character.role}</p>
               </div>
             </div>
             <Button variant="ghost" size="icon" onClick={handleEnd} data-testid="button-close">
@@ -131,8 +200,8 @@ export function ChatInterface() {
             >
               {message.role === "assistant" && (
                 <Avatar className="h-8 w-8 mt-1">
-                  <AvatarImage src={masuoAvatar} alt="ますお兄さん" />
-                  <AvatarFallback>ま</AvatarFallback>
+                  <AvatarImage src={character.avatar} alt={character.name} />
+                  <AvatarFallback>{character.name[0]}</AvatarFallback>
                 </Avatar>
               )}
               <div
@@ -148,6 +217,17 @@ export function ChatInterface() {
               </div>
             </div>
           ))}
+          {chatMutation.isPending && (
+            <div className="flex gap-3">
+              <Avatar className="h-8 w-8 mt-1">
+                <AvatarImage src={character.avatar} alt={character.name} />
+                <AvatarFallback>{character.name[0]}</AvatarFallback>
+              </Avatar>
+              <div className="rounded-2xl px-4 py-3 bg-card text-card-foreground">
+                <p className="text-base">考え中...</p>
+              </div>
+            </div>
+          )}
           <div ref={messagesEndRef} />
         </div>
       </div>
@@ -164,8 +244,15 @@ export function ChatInterface() {
               className="resize-none"
               rows={2}
               data-testid="input-message"
+              disabled={chatMutation.isPending}
             />
-            <Button onClick={handleSend} size="icon" className="shrink-0" data-testid="button-send">
+            <Button 
+              onClick={handleSend} 
+              size="icon" 
+              className="shrink-0" 
+              data-testid="button-send"
+              disabled={chatMutation.isPending || !input.trim()}
+            >
               <Send className="h-5 w-5" />
             </Button>
           </div>

@@ -50,7 +50,7 @@ export function CharacterSelection() {
   const handleStart = () => {
     if (selected) {
       console.log("Starting interview with:", selected);
-      setLocation("/trip/chat");
+      setLocation(`/trip/chat?character=${selected}&type=trip`);
     }
   };
 
