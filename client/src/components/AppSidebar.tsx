@@ -10,7 +10,7 @@ import {
   SidebarMenuItem,
   SidebarHeader,
 } from "@/components/ui/sidebar";
-import { useLocation, Link } from "wouter";
+import { useLocation } from "wouter";
 
 const menuItems = [
   {
@@ -41,7 +41,7 @@ const menuItems = [
 ];
 
 export function AppSidebar() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
 
   return (
     <Sidebar>
@@ -61,19 +61,21 @@ export function AppSidebar() {
           <SidebarGroupLabel>メニュー</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <Link href={item.url}>
+              {menuItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
                       isActive={location === item.url}
+                      onClick={() => setLocation(item.url)}
                       data-testid={`nav-${item.url.slice(1) || 'dashboard'}`}
                     >
-                      <item.icon className="h-4 w-4" />
+                      <Icon className="h-4 w-4" />
                       <span>{item.title}</span>
                     </SidebarMenuButton>
-                  </Link>
-                </SidebarMenuItem>
-              ))}
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
