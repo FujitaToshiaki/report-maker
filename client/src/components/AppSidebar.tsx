@@ -63,16 +63,15 @@ export function AppSidebar() {
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={location === item.url}
-                    data-testid={`nav-${item.url.slice(1) || 'dashboard'}`}
-                  >
-                    <Link href={item.url}>
+                  <Link href={item.url}>
+                    <SidebarMenuButton
+                      isActive={location === item.url}
+                      data-testid={`nav-${item.url.slice(1) || 'dashboard'}`}
+                    >
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
+                    </SidebarMenuButton>
+                  </Link>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
