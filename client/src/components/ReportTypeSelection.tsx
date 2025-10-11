@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, AlertTriangle, ArrowRight } from "lucide-react";
+import { FileText, AlertTriangle, GraduationCap, ArrowRight } from "lucide-react";
 import { useLocation } from "wouter";
 
 const reportTypes = [
@@ -11,6 +11,15 @@ const reportTypes = [
     color: "text-primary",
     bgColor: "bg-primary/10",
     url: "/trip/basic-info",
+  },
+  {
+    id: "seminar",
+    title: "セミナー参加報告書",
+    description: "セミナーで学んだ内容や気づきを報告する",
+    icon: GraduationCap,
+    color: "text-blue-600 dark:text-blue-400",
+    bgColor: "bg-blue-100 dark:bg-blue-900/20",
+    url: "/seminar/basic-info",
   },
   {
     id: "defect",
@@ -34,7 +43,7 @@ export function ReportTypeSelection() {
           <p className="text-muted-foreground">作成する報告書の種類を選んでください</p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-3 gap-6">
           {reportTypes.map((type) => (
             <Card
               key={type.id}
