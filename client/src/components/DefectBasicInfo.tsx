@@ -136,24 +136,22 @@ export function DefectBasicInfo() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="productName">製品名 <span className="text-destructive">*</span></Label>
+                    <Label htmlFor="productName">製品名</Label>
                     <Input
                       id="productName"
                       value={formData.productName}
                       onChange={(e) => setFormData({ ...formData, productName: e.target.value })}
                       placeholder="型番：ABC-123"
-                      required
                       data-testid="input-product-name"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="lotNumber">ロット番号 <span className="text-destructive">*</span></Label>
+                    <Label htmlFor="lotNumber">ロット番号</Label>
                     <Input
                       id="lotNumber"
                       value={formData.lotNumber}
                       onChange={(e) => setFormData({ ...formData, lotNumber: e.target.value })}
                       placeholder="LOT-2024-001"
-                      required
                       data-testid="input-lot-number"
                     />
                   </div>
