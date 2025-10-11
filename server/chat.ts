@@ -160,20 +160,38 @@ export async function generateChatResponse(request: ChatRequest): Promise<string
 
   try {
     // the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
+    console.log("Calling OpenAI API with model: gpt-5");
+    console.log("Messages count:", chatMessages.length);
+    
     const completion = await openai.chat.completions.create({
       model: "gpt-5",
       messages: chatMessages,
-      max_completion_tokens: 500,
+      max_completion_tokens: 2000,
     });
 
+    console.log("OpenAI API response received");
+    console.log("Finish reason:", completion.choices[0]?.finish_reason);
+    
     const response = completion.choices[0]?.message?.content;
+    const finishReason = completion.choices[0]?.finish_reason;
+    
     if (!response) {
-      throw new Error("No response from AI");
+      if (finishReason === 'length') {
+        console.error("Response truncated due to token limit");
+        throw new Error("応答がトークン制限により切り捨てられました。会話を短くしてください。");
+      }
+      console.error("No response content in completion:", JSON.stringify(completion));
+      throw new Error("AIからの応答がありませんでした。もう一度お試しください。");
     }
 
+    console.log("Response generated successfully");
     return response;
   } catch (error) {
     console.error("Error generating chat response:", error);
+    if (error instanceof Error) {
+      console.error("Error message:", error.message);
+      console.error("Error stack:", error.stack);
+    }
     throw error;
   }
 }
