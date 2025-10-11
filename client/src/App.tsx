@@ -12,11 +12,19 @@ import ChatPage from "@/pages/ChatPage";
 import ReportPreviewPage from "@/pages/ReportPreviewPage";
 import DefectBasicInfoPage from "@/pages/DefectBasicInfoPage";
 import DefectCharacterPage from "@/pages/DefectCharacterPage";
+import TripReportsPage from "@/pages/TripReportsPage";
+import DefectReportsPage from "@/pages/DefectReportsPage";
+import SettingsPage from "@/pages/SettingsPage";
+import HelpPage from "@/pages/HelpPage";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={HomePageNew} />
+      <Route path="/trip-reports" component={TripReportsPage} />
+      <Route path="/defect-reports" component={DefectReportsPage} />
+      <Route path="/settings" component={SettingsPage} />
+      <Route path="/help" component={HelpPage} />
       <Route path="/report-type" component={ReportTypePage} />
       
       {/* Trip Report Routes */}
