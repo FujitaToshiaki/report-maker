@@ -96,6 +96,7 @@ export default function TripReportsPage() {
                       <Button 
                         variant="ghost" 
                         size="sm"
+                        onClick={() => setLocation(`/trip-reports/detail?id=${report.id}`)}
                         data-testid={`button-view-${report.id}`}
                       >
                         <Eye className="h-4 w-4 mr-1" />

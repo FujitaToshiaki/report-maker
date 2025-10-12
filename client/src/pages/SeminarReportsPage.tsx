@@ -101,6 +101,7 @@ export default function SeminarReportsPage() {
                       <Button 
                         variant="ghost" 
                         size="sm"
+                        onClick={() => setLocation(`/seminar-reports/detail?id=${report.id}`)}
                         data-testid={`button-view-${report.id}`}
                       >
                         <Eye className="h-4 w-4 mr-1" />
