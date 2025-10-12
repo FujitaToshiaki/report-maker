@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
-import { Send, Save, SkipForward, X } from "lucide-react";
+import { Send, Save, SkipForward, X, Loader2 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
@@ -237,7 +237,10 @@ export function ChatInterface({ characterId, reportType }: ChatInterfaceProps) {
                 <AvatarFallback>{character.name[0]}</AvatarFallback>
               </Avatar>
               <div className="rounded-2xl px-4 py-3 bg-card text-card-foreground">
-                <p className="text-base">考え中...</p>
+                <div className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <p className="text-base">考え中...</p>
+                </div>
               </div>
             </div>
           )}
