@@ -9,6 +9,7 @@ import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 import masuoAvatar from "@assets/stock_images/friendly_mature_japa_e8e63f4f.jpg";
 import ayaAvatar from "@assets/stock_images/young_japanese_woman_c4b45ecb.jpg";
 import kenjiAvatar from "@assets/stock_images/japanese_business_ma_e2c8ac52.jpg";
@@ -78,8 +79,11 @@ export function ChatInterface({ characterId, reportType }: ChatInterfaceProps) {
     },
   ]);
   const [input, setInput] = useState("");
-  const [progress, setProgress] = useState(7); // 1/15 questions
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // Calculate progress based on assistant message count (5 questions max)
+  const assistantCount = messages.filter(m => m.role === 'assistant').length;
+  const progress = Math.min((assistantCount / 5) * 100, 100);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -105,7 +109,6 @@ export function ChatInterface({ characterId, reportType }: ChatInterfaceProps) {
         content: data.message,
       };
       setMessages((prev) => [...prev, aiMessage]);
-      setProgress((prev) => Math.min(prev + 7, 100));
     },
     onError: (error) => {
       console.error("Chat error:", error);
@@ -148,7 +151,7 @@ export function ChatInterface({ characterId, reportType }: ChatInterfaceProps) {
 
   const handleSkip = () => {
     console.log("Skipping question...");
-    setProgress((prev) => Math.min(prev + 7, 100));
+    // Progress is automatically calculated from message count
   };
 
   const handleEnd = () => {
@@ -190,7 +193,7 @@ export function ChatInterface({ characterId, reportType }: ChatInterfaceProps) {
           <div className="space-y-1">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">進捗</span>
-              <span className="font-medium">{Math.round(progress / 7)}/15 質問完了</span>
+              <span className="font-medium">{assistantCount}/5 質問完了</span>
             </div>
             <Progress value={progress} className="h-2" />
           </div>
@@ -283,8 +286,4 @@ export function ChatInterface({ characterId, reportType }: ChatInterfaceProps) {
       </div>
     </div>
   );
-}
-
-function cn(...classes: (string | boolean | undefined)[]) {
-  return classes.filter(Boolean).join(" ");
 }
