@@ -70,16 +70,41 @@ export function ChatInterface({ characterId, reportType }: ChatInterfaceProps) {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const character = characterData[characterId as keyof typeof characterData] || characterData.masuo;
-  
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      role: "assistant",
-      content: character.initialMessage,
-    },
-  ]);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  
+  // Load purpose and set initial message
+  useEffect(() => {
+    let initialMessage = character.initialMessage;
+    
+    if (reportType === "trip") {
+      const storedBasicInfo = localStorage.getItem("tripBasicInfo");
+      if (storedBasicInfo) {
+        const basicInfo = JSON.parse(storedBasicInfo);
+        const purpose = basicInfo.purpose || "";
+        
+        if (purpose) {
+          // Customize initial message with purpose
+          if (characterId === "masuo") {
+            initialMessage = `お疲れさまでした！「${purpose}」の出張やったがね。どんな感じやったがけ？`;
+          } else if (characterId === "aya") {
+            initialMessage = `お疲れさまでした！「${purpose}」の出張やったがね。どうやったがけ？`;
+          } else if (characterId === "kenji") {
+            initialMessage = `お疲れさま。「${purpose}」の出張、どうやったがけ？`;
+          }
+        }
+      }
+    }
+    
+    setMessages([
+      {
+        id: "1",
+        role: "assistant",
+        content: initialMessage,
+      },
+    ]);
+  }, [characterId, reportType, character.initialMessage]);
   
   // Calculate progress based on assistant message count (5 questions max)
   const assistantCount = messages.filter(m => m.role === 'assistant').length;
@@ -95,10 +120,21 @@ export function ChatInterface({ characterId, reportType }: ChatInterfaceProps) {
 
   const chatMutation = useMutation({
     mutationFn: async (userMessage: string) => {
+      // Load purpose for trip reports
+      let purpose = "";
+      if (reportType === "trip") {
+        const storedBasicInfo = localStorage.getItem("tripBasicInfo");
+        if (storedBasicInfo) {
+          const basicInfo = JSON.parse(storedBasicInfo);
+          purpose = basicInfo.purpose || "";
+        }
+      }
+      
       const response = await apiRequest("POST", "/api/chat", {
         messages: messages.map((m) => ({ role: m.role, content: m.content })),
         characterId,
         reportType,
+        purpose,
       });
       return await response.json();
     },

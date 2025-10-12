@@ -178,10 +178,11 @@ interface ChatRequest {
   messages: { role: "user" | "assistant"; content: string }[];
   characterId: string;
   reportType?: "trip" | "defect" | "seminar";
+  purpose?: string;
 }
 
 export async function generateChatResponse(request: ChatRequest): Promise<string> {
-  const { messages, characterId } = request;
+  const { messages, characterId, reportType, purpose } = request;
   
   // Get character prompt
   const character = characterPrompts[characterId as keyof typeof characterPrompts];
@@ -214,11 +215,17 @@ export async function generateChatResponse(request: ChatRequest): Promise<string
   // Keep only the last 10 messages (5 exchanges) to stay within token limits
   const trimmedMessages = messages.slice(-10);
 
+  // Build system prompt with purpose if available (for trip reports)
+  let systemPrompt = character.systemPrompt;
+  if (reportType === "trip" && purpose) {
+    systemPrompt = `${character.systemPrompt}\n\n【出張目的】\nユーザーの出張目的は「${purpose}」です。この目的を念頭に置いて、自然な会話の流れで質問してください。`;
+  }
+
   // Build messages array with system prompt
   const chatMessages: ChatMessage[] = [
     {
       role: "system",
-      content: character.systemPrompt
+      content: systemPrompt
     },
     ...trimmedMessages
   ];

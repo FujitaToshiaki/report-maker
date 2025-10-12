@@ -19,6 +19,7 @@ export function BasicInfoForm() {
     name: "",
     employeeId: "",
     department: "",
+    purpose: "",
     destination: "",
     company: "",
     companions: "",
@@ -105,6 +106,19 @@ export function BasicInfoForm() {
               {/* Trip Details */}
               <div className="space-y-4">
                 <h3 className="text-sm font-medium">出張詳細</h3>
+                <div className="space-y-2">
+                  <Label htmlFor="purpose">
+                    出張目的 <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="purpose"
+                    value={formData.purpose}
+                    onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
+                    placeholder="例：新製品の販売戦略会議、取引先との商談"
+                    required
+                    data-testid="input-purpose"
+                  />
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>
