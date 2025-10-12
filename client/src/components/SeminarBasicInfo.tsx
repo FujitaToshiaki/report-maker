@@ -25,7 +25,15 @@ export function SeminarBasicInfo() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", { ...formData, seminarDate });
+    const basicInfo = { 
+      ...formData, 
+      seminarDate: seminarDate ? format(seminarDate, "yyyy年M月d日", { locale: ja }) : "" 
+    };
+    console.log("Form submitted:", basicInfo);
+    
+    // Save to localStorage
+    localStorage.setItem("seminarBasicInfo", JSON.stringify(basicInfo));
+    
     setLocation("/seminar/character-selection");
   };
 

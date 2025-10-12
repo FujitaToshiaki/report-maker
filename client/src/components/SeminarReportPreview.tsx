@@ -8,26 +8,24 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
-interface TripReport {
-  purpose: string;
-  activities: string[];
-  achievements: string[];
-  issues: { issue: string; cause: string }[];
-  actions: { action: string; deadline: string; person: string }[];
-  impression: string;
+interface SeminarReport {
+  summary: string;
+  learnings: string[];
+  insights: string[];
+  applications: string[];
 }
 
-export function ReportPreview() {
+export function SeminarReportPreview() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [report, setReport] = useState<TripReport | null>(null);
+  const [report, setReport] = useState<SeminarReport | null>(null);
   const [basicInfo, setBasicInfo] = useState<any>(null);
 
   const generateMutation = useMutation({
     mutationFn: async ({ messages, basicInfo }: { messages: any[]; basicInfo: any }) => {
       const response = await apiRequest("POST", "/api/generate-report", {
         messages,
-        reportType: "trip",
+        reportType: "seminar",
         basicInfo,
       });
       return await response.json();
@@ -47,8 +45,8 @@ export function ReportPreview() {
 
   useEffect(() => {
     // Load basic info and chat history from localStorage
-    const storedBasicInfo = localStorage.getItem("tripBasicInfo");
-    const storedChatHistory = localStorage.getItem("tripChatHistory");
+    const storedBasicInfo = localStorage.getItem("seminarBasicInfo");
+    const storedChatHistory = localStorage.getItem("seminarChatHistory");
 
     if (!storedBasicInfo || !storedChatHistory) {
       toast({
@@ -56,7 +54,7 @@ export function ReportPreview() {
         description: "必要な情報が見つかりません。最初からやり直してください。",
         variant: "destructive",
       });
-      setLocation("/trip/basic-info");
+      setLocation("/seminar/basic-info");
       return;
     }
 
@@ -83,9 +81,9 @@ export function ReportPreview() {
   const handleSubmit = () => {
     console.log("Submit report");
     // Clear localStorage
-    localStorage.removeItem("tripBasicInfo");
-    localStorage.removeItem("tripChatHistory");
-    localStorage.removeItem("tripCharacter");
+    localStorage.removeItem("seminarBasicInfo");
+    localStorage.removeItem("seminarChatHistory");
+    localStorage.removeItem("seminarCharacter");
     setLocation("/");
   };
 
@@ -132,7 +130,7 @@ export function ReportPreview() {
         {/* Report */}
         <Card>
           <CardHeader className="text-center space-y-2">
-            <CardTitle className="text-2xl">出張報告書</CardTitle>
+            <CardTitle className="text-2xl">セミナー参加報告書</CardTitle>
             <Separator />
           </CardHeader>
           <CardContent className="space-y-6">
@@ -149,40 +147,42 @@ export function ReportPreview() {
                   <span className="font-mono">{basicInfo.employeeId}</span>
                 </p>
                 <p>
-                  <span className="font-medium">出張期間：</span>
-                  {basicInfo.startDate} 〜 {basicInfo.endDate}
+                  <span className="font-medium">セミナー名：</span>
+                  {basicInfo.seminarName}
                 </p>
                 <p>
-                  <span className="font-medium">出張先：</span>
-                  {basicInfo.destination} {basicInfo.company}
+                  <span className="font-medium">開催日：</span>
+                  {basicInfo.seminarDate}
                 </p>
-                {basicInfo.companions && (
-                  <p>
-                    <span className="font-medium">同行者：</span>
-                    {basicInfo.companions}
-                  </p>
-                )}
+                <p>
+                  <span className="font-medium">主催者：</span>
+                  {basicInfo.organizer}
+                </p>
+                <p>
+                  <span className="font-medium">開催場所：</span>
+                  {basicInfo.location}
+                </p>
               </div>
             </section>
 
             <Separator />
 
-            {/* Purpose */}
+            {/* Summary */}
             <section className="space-y-3">
-              <h3 className="font-semibold text-lg">【出張目的】</h3>
-              <p className="text-sm leading-relaxed">{report.purpose}</p>
+              <h3 className="font-semibold text-lg">【セミナー概要】</h3>
+              <p className="text-sm leading-relaxed">{report.summary}</p>
             </section>
 
             <Separator />
 
-            {/* Activities */}
+            {/* Learnings */}
             <section className="space-y-3">
-              <h3 className="font-semibold text-lg">【活動内容】</h3>
+              <h3 className="font-semibold text-lg">【学んだこと】</h3>
               <ul className="space-y-1">
-                {report.activities.map((activity, idx) => (
+                {report.learnings.map((learning, idx) => (
                   <li key={idx} className="text-sm flex">
                     <span className="mr-2">•</span>
-                    <span>{activity}</span>
+                    <span>{learning}</span>
                   </li>
                 ))}
               </ul>
@@ -190,61 +190,32 @@ export function ReportPreview() {
 
             <Separator />
 
-            {/* Achievements */}
+            {/* Insights */}
             <section className="space-y-3">
-              <h3 className="font-semibold text-lg">【成果・収穫】</h3>
-              <ol className="space-y-1">
-                {report.achievements.map((achievement, idx) => (
+              <h3 className="font-semibold text-lg">【気づき】</h3>
+              <ul className="space-y-1">
+                {report.insights.map((insight, idx) => (
                   <li key={idx} className="text-sm flex">
-                    <span className="mr-2">{idx + 1}.</span>
-                    <span>{achievement}</span>
+                    <span className="mr-2">•</span>
+                    <span>{insight}</span>
                   </li>
                 ))}
-              </ol>
+              </ul>
             </section>
 
             <Separator />
 
-            {/* Issues */}
+            {/* Applications */}
             <section className="space-y-3">
-              <h3 className="font-semibold text-lg">【課題・問題点】</h3>
-              {report.issues.map((item, idx) => (
-                <div key={idx} className="space-y-1 text-sm">
-                  <p>
-                    <span className="font-medium">■ 課題：</span>
-                    {item.issue}
-                  </p>
-                  <p className="ml-4">
-                    <span className="font-medium">原因：</span>
-                    {item.cause}
-                  </p>
-                </div>
-              ))}
-            </section>
-
-            <Separator />
-
-            {/* Actions */}
-            <section className="space-y-3">
-              <h3 className="font-semibold text-lg">【今後のアクション】</h3>
-              <div className="space-y-2">
-                {report.actions.map((action, idx) => (
-                  <div key={idx} className="text-sm flex">
+              <h3 className="font-semibold text-lg">【今後の活用方法】</h3>
+              <ul className="space-y-1">
+                {report.applications.map((application, idx) => (
+                  <li key={idx} className="text-sm flex">
                     <span className="mr-2">□</span>
-                    <span>
-                      {action.action}（期限：{action.deadline}、担当：{action.person}）
-                    </span>
-                  </div>
+                    <span>{application}</span>
+                  </li>
                 ))}
-              </div>
-            </section>
-
-            <Separator />
-
-            {/* Impression */}
-            <section className="space-y-3">
-              <h3 className="font-semibold text-lg">【所感】</h3>
-              <p className="text-sm leading-relaxed">{report.impression}</p>
+              </ul>
             </section>
 
             <div className="pt-4 text-center text-sm text-muted-foreground">以上</div>
