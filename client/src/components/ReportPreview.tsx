@@ -58,6 +58,7 @@ export function ReportPreview() {
     // Load basic info and chat history from localStorage
     const storedBasicInfo = localStorage.getItem("tripBasicInfo");
     const storedChatHistory = localStorage.getItem("tripChatHistory");
+    const storedReport = localStorage.getItem("tripReport");
 
     if (!storedBasicInfo || !storedChatHistory) {
       toast({
@@ -70,13 +71,20 @@ export function ReportPreview() {
     }
 
     const parsedBasicInfo = JSON.parse(storedBasicInfo);
-    const parsedChatHistory = JSON.parse(storedChatHistory);
-
     setBasicInfo(parsedBasicInfo);
-    generateMutation.mutate({
-      messages: parsedChatHistory,
-      basicInfo: parsedBasicInfo,
-    });
+
+    // If there's a saved report, use it instead of generating a new one
+    if (storedReport) {
+      const parsedReport = JSON.parse(storedReport);
+      setReport(parsedReport);
+    } else {
+      // Generate new report from chat history
+      const parsedChatHistory = JSON.parse(storedChatHistory);
+      generateMutation.mutate({
+        messages: parsedChatHistory,
+        basicInfo: parsedBasicInfo,
+      });
+    }
   }, []);
 
   const handleEdit = () => {
@@ -91,8 +99,9 @@ export function ReportPreview() {
     setReport(editedReport);
     setBasicInfo(editedBasicInfo);
     
-    // Update localStorage
+    // Update localStorage with both basic info and report
     localStorage.setItem("tripBasicInfo", JSON.stringify(editedBasicInfo));
+    localStorage.setItem("tripReport", JSON.stringify(editedReport));
     
     setIsEditMode(false);
     
@@ -364,7 +373,16 @@ export function ReportPreview() {
             {/* Purpose */}
             <section className="space-y-3">
               <h3 className="font-semibold text-lg">【出張目的】</h3>
-              <p className="text-sm leading-relaxed">{report.purpose}</p>
+              {isEditMode && editedReport ? (
+                <Textarea
+                  value={editedReport.purpose}
+                  onChange={(e) => setEditedReport({ ...editedReport, purpose: e.target.value })}
+                  rows={3}
+                  data-testid="textarea-edit-purpose"
+                />
+              ) : (
+                <p className="text-sm leading-relaxed">{report.purpose}</p>
+              )}
             </section>
 
             <Separator />
@@ -372,14 +390,34 @@ export function ReportPreview() {
             {/* Activities */}
             <section className="space-y-3">
               <h3 className="font-semibold text-lg">【活動内容】</h3>
-              <ul className="space-y-1">
-                {report.activities.map((activity, idx) => (
-                  <li key={idx} className="text-sm flex">
-                    <span className="mr-2">•</span>
-                    <span>{activity}</span>
-                  </li>
-                ))}
-              </ul>
+              {isEditMode && editedReport ? (
+                <div className="space-y-2">
+                  {editedReport.activities.map((activity, idx) => (
+                    <div key={idx} className="flex gap-2">
+                      <span className="text-sm mt-2">•</span>
+                      <Textarea
+                        value={activity}
+                        onChange={(e) => {
+                          const newActivities = [...editedReport.activities];
+                          newActivities[idx] = e.target.value;
+                          setEditedReport({ ...editedReport, activities: newActivities });
+                        }}
+                        rows={2}
+                        data-testid={`textarea-edit-activity-${idx}`}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <ul className="space-y-1">
+                  {report.activities.map((activity, idx) => (
+                    <li key={idx} className="text-sm flex">
+                      <span className="mr-2">•</span>
+                      <span>{activity}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </section>
 
             <Separator />
@@ -387,14 +425,34 @@ export function ReportPreview() {
             {/* Achievements */}
             <section className="space-y-3">
               <h3 className="font-semibold text-lg">【成果・収穫】</h3>
-              <ol className="space-y-1">
-                {report.achievements.map((achievement, idx) => (
-                  <li key={idx} className="text-sm flex">
-                    <span className="mr-2">{idx + 1}.</span>
-                    <span>{achievement}</span>
-                  </li>
-                ))}
-              </ol>
+              {isEditMode && editedReport ? (
+                <div className="space-y-2">
+                  {editedReport.achievements.map((achievement, idx) => (
+                    <div key={idx} className="flex gap-2">
+                      <span className="text-sm mt-2">{idx + 1}.</span>
+                      <Textarea
+                        value={achievement}
+                        onChange={(e) => {
+                          const newAchievements = [...editedReport.achievements];
+                          newAchievements[idx] = e.target.value;
+                          setEditedReport({ ...editedReport, achievements: newAchievements });
+                        }}
+                        rows={2}
+                        data-testid={`textarea-edit-achievement-${idx}`}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <ol className="space-y-1">
+                  {report.achievements.map((achievement, idx) => (
+                    <li key={idx} className="text-sm flex">
+                      <span className="mr-2">{idx + 1}.</span>
+                      <span>{achievement}</span>
+                    </li>
+                  ))}
+                </ol>
+              )}
             </section>
 
             <Separator />
@@ -402,18 +460,53 @@ export function ReportPreview() {
             {/* Issues */}
             <section className="space-y-3">
               <h3 className="font-semibold text-lg">【課題・問題点】</h3>
-              {report.issues.map((item, idx) => (
-                <div key={idx} className="space-y-1 text-sm">
-                  <p>
-                    <span className="font-medium">■ 課題：</span>
-                    {item.issue}
-                  </p>
-                  <p className="ml-4">
-                    <span className="font-medium">原因：</span>
-                    {item.cause}
-                  </p>
+              {isEditMode && editedReport ? (
+                <div className="space-y-3">
+                  {editedReport.issues.map((item, idx) => (
+                    <div key={idx} className="space-y-2">
+                      <div>
+                        <label className="text-sm font-medium">■ 課題</label>
+                        <Textarea
+                          value={item.issue}
+                          onChange={(e) => {
+                            const newIssues = [...editedReport.issues];
+                            newIssues[idx] = { ...newIssues[idx], issue: e.target.value };
+                            setEditedReport({ ...editedReport, issues: newIssues });
+                          }}
+                          rows={2}
+                          data-testid={`textarea-edit-issue-${idx}`}
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium">原因</label>
+                        <Textarea
+                          value={item.cause}
+                          onChange={(e) => {
+                            const newIssues = [...editedReport.issues];
+                            newIssues[idx] = { ...newIssues[idx], cause: e.target.value };
+                            setEditedReport({ ...editedReport, issues: newIssues });
+                          }}
+                          rows={2}
+                          data-testid={`textarea-edit-cause-${idx}`}
+                        />
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              ) : (
+                report.issues.map((item, idx) => (
+                  <div key={idx} className="space-y-1 text-sm">
+                    <p>
+                      <span className="font-medium">■ 課題：</span>
+                      {item.issue}
+                    </p>
+                    <p className="ml-4">
+                      <span className="font-medium">原因：</span>
+                      {item.cause}
+                    </p>
+                  </div>
+                ))
+              )}
             </section>
 
             <Separator />
@@ -421,16 +514,64 @@ export function ReportPreview() {
             {/* Actions */}
             <section className="space-y-3">
               <h3 className="font-semibold text-lg">【今後のアクション】</h3>
-              <div className="space-y-2">
-                {report.actions.map((action, idx) => (
-                  <div key={idx} className="text-sm flex">
-                    <span className="mr-2">□</span>
-                    <span>
-                      {action.action}（期限：{action.deadline}、担当：{action.person}）
-                    </span>
-                  </div>
-                ))}
-              </div>
+              {isEditMode && editedReport ? (
+                <div className="space-y-3">
+                  {editedReport.actions.map((action, idx) => (
+                    <div key={idx} className="space-y-2 p-3 border rounded-md">
+                      <div>
+                        <label className="text-sm font-medium">アクション内容</label>
+                        <Textarea
+                          value={action.action}
+                          onChange={(e) => {
+                            const newActions = [...editedReport.actions];
+                            newActions[idx] = { ...newActions[idx], action: e.target.value };
+                            setEditedReport({ ...editedReport, actions: newActions });
+                          }}
+                          rows={2}
+                          data-testid={`textarea-edit-action-${idx}`}
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="text-sm font-medium">期限</label>
+                          <Input
+                            value={action.deadline}
+                            onChange={(e) => {
+                              const newActions = [...editedReport.actions];
+                              newActions[idx] = { ...newActions[idx], deadline: e.target.value };
+                              setEditedReport({ ...editedReport, actions: newActions });
+                            }}
+                            data-testid={`input-edit-deadline-${idx}`}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">担当</label>
+                          <Input
+                            value={action.person}
+                            onChange={(e) => {
+                              const newActions = [...editedReport.actions];
+                              newActions[idx] = { ...newActions[idx], person: e.target.value };
+                              setEditedReport({ ...editedReport, actions: newActions });
+                            }}
+                            data-testid={`input-edit-person-${idx}`}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {report.actions.map((action, idx) => (
+                    <div key={idx} className="text-sm flex">
+                      <span className="mr-2">□</span>
+                      <span>
+                        {action.action}（期限：{action.deadline}、担当：{action.person}）
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </section>
 
             <Separator />
@@ -438,7 +579,16 @@ export function ReportPreview() {
             {/* Impression */}
             <section className="space-y-3">
               <h3 className="font-semibold text-lg">【所感】</h3>
-              <p className="text-sm leading-relaxed">{report.impression}</p>
+              {isEditMode && editedReport ? (
+                <Textarea
+                  value={editedReport.impression}
+                  onChange={(e) => setEditedReport({ ...editedReport, impression: e.target.value })}
+                  rows={4}
+                  data-testid="textarea-edit-impression"
+                />
+              ) : (
+                <p className="text-sm leading-relaxed">{report.impression}</p>
+              )}
             </section>
 
             <div className="pt-4 text-center text-sm text-muted-foreground">以上</div>
