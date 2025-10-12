@@ -23,7 +23,7 @@ interface Message {
 
 interface ChatInterfaceProps {
   characterId: string;
-  reportType: "trip" | "defect";
+  reportType: "trip" | "defect" | "seminar";
 }
 
 const characterData = {
@@ -153,7 +153,17 @@ export function ChatInterface({ characterId, reportType }: ChatInterfaceProps) {
 
   const handleEnd = () => {
     console.log("Ending interview...");
-    const previewPath = reportType === "trip" ? "/trip/preview" : "/defect/preview";
+    
+    // Save chat history to localStorage
+    const chatHistory = messages.map((m) => ({ 
+      role: m.role, 
+      content: m.content 
+    }));
+    localStorage.setItem(`${reportType}ChatHistory`, JSON.stringify(chatHistory));
+    
+    const previewPath = reportType === "trip" ? "/trip/preview" : 
+                        reportType === "seminar" ? "/seminar/preview" : 
+                        "/defect/preview";
     setLocation(previewPath);
   };
 
