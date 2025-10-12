@@ -16,6 +16,7 @@ import ChatPage from "@/pages/ChatPage";
 import ReportPreviewPage from "@/pages/ReportPreviewPage";
 import DefectBasicInfoPage from "@/pages/DefectBasicInfoPage";
 import DefectCharacterPage from "@/pages/DefectCharacterPage";
+import DefectReportPreviewPage from "@/pages/DefectReportPreviewPage";
 import SeminarBasicInfoPage from "@/pages/SeminarBasicInfoPage";
 import SeminarCharacterPage from "@/pages/SeminarCharacterPage";
 import SeminarReportPreviewPage from "@/pages/SeminarReportPreviewPage";
@@ -52,7 +53,7 @@ function Router() {
       <Route path="/defect/basic-info" component={DefectBasicInfoPage} />
       <Route path="/defect/character-selection" component={DefectCharacterPage} />
       <Route path="/defect/chat" component={ChatPage} />
-      <Route path="/defect/preview" component={ReportPreviewPage} />
+      <Route path="/defect/preview" component={DefectReportPreviewPage} />
       
       {/* Seminar Report Routes */}
       <Route path="/seminar/basic-info" component={SeminarBasicInfoPage} />

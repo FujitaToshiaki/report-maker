@@ -27,7 +27,16 @@ export function BasicInfoForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", { ...formData, startDate, endDate });
+    const basicInfo = {
+      ...formData,
+      startDate: startDate ? format(startDate, "yyyy年M月d日", { locale: ja }) : "",
+      endDate: endDate ? format(endDate, "yyyy年M月d日", { locale: ja }) : "",
+    };
+    console.log("Form submitted:", basicInfo);
+    
+    // Save to localStorage
+    localStorage.setItem("tripBasicInfo", JSON.stringify(basicInfo));
+    
     setLocation("/trip/character-selection");
   };
 

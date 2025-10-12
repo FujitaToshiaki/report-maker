@@ -33,7 +33,17 @@ export function DefectBasicInfo() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Defect form submitted:", { ...formData, discoveryDate, manufactureDate });
+    const basicInfo = { 
+      ...formData, 
+      discoveryDate: discoveryDate ? discoveryDate.toLocaleDateString("ja-JP") : "",
+      manufactureDate: manufactureDate ? manufactureDate.toLocaleDateString("ja-JP") : "",
+      reportDate: new Date().toLocaleDateString("ja-JP")
+    };
+    console.log("Defect form submitted:", basicInfo);
+    
+    // Save to localStorage
+    localStorage.setItem("defectBasicInfo", JSON.stringify(basicInfo));
+    
     setLocation("/defect/character-selection");
   };
 
