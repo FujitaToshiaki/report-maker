@@ -189,6 +189,27 @@ export async function generateChatResponse(request: ChatRequest): Promise<string
     throw new Error(`Unknown character: ${characterId}`);
   }
 
+  // Count assistant messages (questions) to enforce 5-question limit
+  const assistantMessageCount = messages.filter(m => m.role === 'assistant').length;
+  console.log("Assistant message count:", assistantMessageCount);
+
+  // If already 5 or more assistant messages, return closing message directly
+  if (assistantMessageCount >= 5) {
+    console.log("Reached 5 questions limit, returning closing message");
+    const closingMessages = {
+      masuo: "これで大体わかったちゃ。おつかれさまやったがいぜ！",
+      aya: "わかったやちゃ！いろいろ聞かせてくれてありがとうながいぜ！",
+      kenji: "よし、わかったがいぜ。おつかれさまやったちゃ！",
+      masaru: "根本原因がわかったがいぜ。ありがとうちゃ！",
+      yumi: "わかったちゃ。現場の声が聞けてよかったがいぜ！",
+      takashi: "データから見えてきたがいぜ。ありがとうちゃ！",
+      takeshi: "いい学びができたがいぜ。おつかれさまやったちゃ！",
+      sayuri: "素敵な学びやったちゃ。応援しとるがいぜ！",
+      koji: "僕も勉強になったがいぜ！ありがとうやちゃ！"
+    };
+    return closingMessages[characterId as keyof typeof closingMessages] || "ありがとうございました！";
+  }
+
   // Trim message history to prevent token overflow
   // Keep only the last 10 messages (5 exchanges) to stay within token limits
   const trimmedMessages = messages.slice(-10);
@@ -201,6 +222,15 @@ export async function generateChatResponse(request: ChatRequest): Promise<string
     },
     ...trimmedMessages
   ];
+
+  // If this is the 4th question, add instruction to wrap up
+  if (assistantMessageCount === 4) {
+    chatMessages.push({
+      role: "system",
+      content: "これが最後の質問です。次の応答で会話を自然に締めくくってください。"
+    });
+    console.log("Added wrap-up instruction for 5th question");
+  }
 
   try {
     // the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
