@@ -31,6 +31,10 @@ export function SeminarBasicInfo() {
     };
     console.log("Form submitted:", basicInfo);
     
+    // Clear old chat history and report data before starting a new report
+    localStorage.removeItem("seminarChatHistory");
+    localStorage.removeItem("seminarReport");
+    
     // Save to localStorage
     localStorage.setItem("seminarBasicInfo", JSON.stringify(basicInfo));
     

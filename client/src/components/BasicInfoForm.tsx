@@ -35,6 +35,10 @@ export function BasicInfoForm() {
     };
     console.log("Form submitted:", basicInfo);
     
+    // Clear old chat history and report data before starting a new report
+    localStorage.removeItem("tripChatHistory");
+    localStorage.removeItem("tripReport");
+    
     // Save to localStorage
     localStorage.setItem("tripBasicInfo", JSON.stringify(basicInfo));
     

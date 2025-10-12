@@ -41,6 +41,10 @@ export function DefectBasicInfo() {
     };
     console.log("Defect form submitted:", basicInfo);
     
+    // Clear old chat history and report data before starting a new report
+    localStorage.removeItem("defectChatHistory");
+    localStorage.removeItem("defectReport");
+    
     // Save to localStorage
     localStorage.setItem("defectBasicInfo", JSON.stringify(basicInfo));
     
