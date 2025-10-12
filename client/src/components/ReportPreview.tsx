@@ -1,7 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Edit2, Download, Send, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Edit2, Download, Send, Loader2, Save, X } from "lucide-react";
 import { useLocation } from "wouter";
 import { useState, useEffect, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
@@ -25,6 +27,9 @@ export function ReportPreview() {
   const [report, setReport] = useState<TripReport | null>(null);
   const [basicInfo, setBasicInfo] = useState<any>(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editedReport, setEditedReport] = useState<TripReport | null>(null);
+  const [editedBasicInfo, setEditedBasicInfo] = useState<any>(null);
   const reportRef = useRef<HTMLDivElement>(null);
 
   const generateMutation = useMutation({
@@ -75,8 +80,32 @@ export function ReportPreview() {
   }, []);
 
   const handleEdit = () => {
-    console.log("Edit report");
-    // In real app, navigate to edit mode
+    setEditedReport(JSON.parse(JSON.stringify(report)));
+    setEditedBasicInfo(JSON.parse(JSON.stringify(basicInfo)));
+    setIsEditMode(true);
+  };
+
+  const handleSave = () => {
+    if (!editedReport || !editedBasicInfo) return;
+    
+    setReport(editedReport);
+    setBasicInfo(editedBasicInfo);
+    
+    // Update localStorage
+    localStorage.setItem("tripBasicInfo", JSON.stringify(editedBasicInfo));
+    
+    setIsEditMode(false);
+    
+    toast({
+      title: "保存完了",
+      description: "報告書を更新しました。",
+    });
+  };
+
+  const handleCancel = () => {
+    setEditedReport(null);
+    setEditedBasicInfo(null);
+    setIsEditMode(false);
   };
 
   const handleDownload = async () => {
@@ -174,32 +203,47 @@ export function ReportPreview() {
 
         {/* Actions */}
         <div className="flex flex-wrap gap-3">
-          <Button variant="outline" onClick={handleEdit} data-testid="button-edit">
-            <Edit2 className="mr-2 h-4 w-4" />
-            編集
-          </Button>
-          <Button 
-            variant="outline" 
-            onClick={handleDownload} 
-            disabled={isDownloading}
-            data-testid="button-download"
-          >
-            {isDownloading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                PDF生成中...
-              </>
-            ) : (
-              <>
-                <Download className="mr-2 h-4 w-4" />
-                PDF出力
-              </>
-            )}
-          </Button>
-          <Button className="ml-auto" onClick={handleSubmit} data-testid="button-submit">
-            <Send className="mr-2 h-4 w-4" />
-            提出
-          </Button>
+          {isEditMode ? (
+            <>
+              <Button variant="default" onClick={handleSave} data-testid="button-save">
+                <Save className="mr-2 h-4 w-4" />
+                保存
+              </Button>
+              <Button variant="outline" onClick={handleCancel} data-testid="button-cancel">
+                <X className="mr-2 h-4 w-4" />
+                キャンセル
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="outline" onClick={handleEdit} data-testid="button-edit">
+                <Edit2 className="mr-2 h-4 w-4" />
+                編集
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={handleDownload} 
+                disabled={isDownloading}
+                data-testid="button-download"
+              >
+                {isDownloading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    PDF生成中...
+                  </>
+                ) : (
+                  <>
+                    <Download className="mr-2 h-4 w-4" />
+                    PDF出力
+                  </>
+                )}
+              </Button>
+              <Button className="ml-auto" onClick={handleSubmit} data-testid="button-submit">
+                <Send className="mr-2 h-4 w-4" />
+                提出
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Report */}
@@ -212,30 +256,107 @@ export function ReportPreview() {
             {/* Basic Info */}
             <section className="space-y-3">
               <h3 className="font-semibold text-lg">【基本情報】</h3>
-              <div className="space-y-1 text-sm">
-                <p>
-                  <span className="font-medium">報告者：</span>
-                  {basicInfo.name}（{basicInfo.department}）
-                </p>
-                <p>
-                  <span className="font-medium">社員ID：</span>
-                  <span className="font-mono">{basicInfo.employeeId}</span>
-                </p>
-                <p>
-                  <span className="font-medium">出張期間：</span>
-                  {basicInfo.startDate} 〜 {basicInfo.endDate}
-                </p>
-                <p>
-                  <span className="font-medium">出張先：</span>
-                  {basicInfo.destination} {basicInfo.company}
-                </p>
-                {basicInfo.companions && (
+              {isEditMode && editedBasicInfo ? (
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-sm font-medium">報告者</label>
+                      <Input
+                        value={editedBasicInfo.name}
+                        onChange={(e) => setEditedBasicInfo({ ...editedBasicInfo, name: e.target.value })}
+                        data-testid="input-edit-name"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">部署</label>
+                      <Input
+                        value={editedBasicInfo.department}
+                        onChange={(e) => setEditedBasicInfo({ ...editedBasicInfo, department: e.target.value })}
+                        data-testid="input-edit-department"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">社員ID</label>
+                    <Input
+                      value={editedBasicInfo.employeeId}
+                      onChange={(e) => setEditedBasicInfo({ ...editedBasicInfo, employeeId: e.target.value })}
+                      data-testid="input-edit-employee-id"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-sm font-medium">出張開始日</label>
+                      <Input
+                        type="date"
+                        value={editedBasicInfo.startDate}
+                        onChange={(e) => setEditedBasicInfo({ ...editedBasicInfo, startDate: e.target.value })}
+                        data-testid="input-edit-start-date"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">出張終了日</label>
+                      <Input
+                        type="date"
+                        value={editedBasicInfo.endDate}
+                        onChange={(e) => setEditedBasicInfo({ ...editedBasicInfo, endDate: e.target.value })}
+                        data-testid="input-edit-end-date"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-sm font-medium">出張先</label>
+                      <Input
+                        value={editedBasicInfo.destination}
+                        onChange={(e) => setEditedBasicInfo({ ...editedBasicInfo, destination: e.target.value })}
+                        data-testid="input-edit-destination"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">会社名</label>
+                      <Input
+                        value={editedBasicInfo.company || ''}
+                        onChange={(e) => setEditedBasicInfo({ ...editedBasicInfo, company: e.target.value })}
+                        data-testid="input-edit-company"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">同行者（任意）</label>
+                    <Input
+                      value={editedBasicInfo.companions || ''}
+                      onChange={(e) => setEditedBasicInfo({ ...editedBasicInfo, companions: e.target.value })}
+                      data-testid="input-edit-companions"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-1 text-sm">
                   <p>
-                    <span className="font-medium">同行者：</span>
-                    {basicInfo.companions}
+                    <span className="font-medium">報告者：</span>
+                    {basicInfo.name}（{basicInfo.department}）
                   </p>
-                )}
-              </div>
+                  <p>
+                    <span className="font-medium">社員ID：</span>
+                    <span className="font-mono">{basicInfo.employeeId}</span>
+                  </p>
+                  <p>
+                    <span className="font-medium">出張期間：</span>
+                    {basicInfo.startDate} 〜 {basicInfo.endDate}
+                  </p>
+                  <p>
+                    <span className="font-medium">出張先：</span>
+                    {basicInfo.destination} {basicInfo.company}
+                  </p>
+                  {basicInfo.companions && (
+                    <p>
+                      <span className="font-medium">同行者：</span>
+                      {basicInfo.companions}
+                    </p>
+                  )}
+                </div>
+              )}
             </section>
 
             <Separator />
