@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { generateChatResponse } from "./chat";
+import { generateReport } from "./report-generator";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Chat API endpoint
@@ -32,6 +33,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       res.status(500).json({ error: "応答の生成に失敗しました。もう一度お試しください。" });
+    }
+  });
+
+  // Report generation API endpoint
+  app.post("/api/generate-report", async (req, res) => {
+    try {
+      const { messages, reportType, basicInfo } = req.body;
+
+      if (!messages || !reportType || !basicInfo) {
+        return res.status(400).json({ error: "必須フィールドが不足しています" });
+      }
+
+      const report = await generateReport(messages, reportType, basicInfo);
+
+      res.json({ report });
+    } catch (error) {
+      console.error("Report generation error:", error);
+      
+      if (error instanceof Error) {
+        return res.status(400).json({ error: error.message });
+      }
+      
+      res.status(500).json({ error: "報告書の生成に失敗しました。もう一度お試しください。" });
     }
   });
 
