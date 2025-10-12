@@ -3,10 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Edit2, Download, Send, Loader2 } from "lucide-react";
 import { useLocation } from "wouter";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 interface DefectReport {
   defectDescription: string;
@@ -34,6 +36,8 @@ export function DefectReportPreview() {
   const { toast } = useToast();
   const [report, setReport] = useState<DefectReport | null>(null);
   const [basicInfo, setBasicInfo] = useState<any>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const reportRef = useRef<HTMLDivElement>(null);
 
   const generateMutation = useMutation({
     mutationFn: async ({ messages, basicInfo }: { messages: any[]; basicInfo: any }) => {
@@ -87,9 +91,60 @@ export function DefectReportPreview() {
     // In real app, navigate to edit mode
   };
 
-  const handleDownload = () => {
-    console.log("Download PDF");
-    // In real app, generate and download PDF
+  const handleDownload = async () => {
+    if (!reportRef.current) return;
+    
+    setIsDownloading(true);
+    try {
+      const canvas = await html2canvas(reportRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+
+      const imgWidth = 210;
+      const pageHeight = 297;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgData = canvas.toDataURL('image/png');
+      
+      if (imgHeight <= pageHeight) {
+        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      } else {
+        let heightLeft = imgHeight;
+        let position = 0;
+        
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+        
+        while (heightLeft > 0) {
+          position = heightLeft - imgHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
+      }
+      
+      const timestamp = new Date().toISOString().slice(0, 10);
+      const filename = `不良品報告書_${basicInfo.reporterName}_${timestamp}.pdf`;
+      
+      pdf.save(filename);
+      
+      toast({
+        title: "PDF出力完了",
+        description: "報告書をPDF形式でダウンロードしました。",
+      });
+    } catch (error) {
+      console.error("PDF generation error:", error);
+      toast({
+        title: "エラー",
+        description: "PDF出力に失敗しました。",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   const handleSubmit = () => {
@@ -131,9 +186,23 @@ export function DefectReportPreview() {
             <Edit2 className="mr-2 h-4 w-4" />
             編集
           </Button>
-          <Button variant="outline" onClick={handleDownload} data-testid="button-download">
-            <Download className="mr-2 h-4 w-4" />
-            PDF出力
+          <Button 
+            variant="outline" 
+            onClick={handleDownload} 
+            disabled={isDownloading}
+            data-testid="button-download"
+          >
+            {isDownloading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                PDF生成中...
+              </>
+            ) : (
+              <>
+                <Download className="mr-2 h-4 w-4" />
+                PDF出力
+              </>
+            )}
           </Button>
           <Button className="ml-auto" onClick={handleSubmit} data-testid="button-submit">
             <Send className="mr-2 h-4 w-4" />
@@ -142,7 +211,7 @@ export function DefectReportPreview() {
         </div>
 
         {/* Report */}
-        <Card>
+        <Card ref={reportRef}>
           <CardHeader className="text-center space-y-2">
             <CardTitle className="text-2xl">不良品報告書</CardTitle>
             <Separator />
