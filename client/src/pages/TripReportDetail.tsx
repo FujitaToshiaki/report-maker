@@ -117,7 +117,11 @@ export default function TripReportDetail() {
       <div className="p-6">
         <div className="max-w-4xl mx-auto">
           <p>報告書が見つかりません</p>
-          <Button onClick={() => setLocation("/trip-reports")} className="mt-4">
+          <Button 
+            onClick={() => setLocation("/trip-reports")} 
+            className="mt-4"
+            data-testid="button-back-to-list-error"
+          >
             一覧に戻る
           </Button>
         </div>
@@ -133,17 +137,17 @@ export default function TripReportDetail() {
           <Button
             variant="ghost"
             onClick={() => setLocation("/trip-reports")}
-            data-testid="button-back"
+            data-testid="button-back-to-list"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             一覧に戻る
           </Button>
           <div className="flex gap-2">
-            <Button variant="outline" data-testid="button-edit">
+            <Button variant="outline" data-testid="button-edit-report">
               <Edit className="h-4 w-4 mr-2" />
               編集
             </Button>
-            <Button data-testid="button-download">
+            <Button data-testid="button-download-pdf">
               <Download className="h-4 w-4 mr-2" />
               PDF出力
             </Button>
