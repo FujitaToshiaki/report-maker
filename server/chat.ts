@@ -247,7 +247,7 @@ export async function generateChatResponse(request: ChatRequest): Promise<string
     const completion = await openai.chat.completions.create({
       model: "gpt-5",
       messages: chatMessages,
-      max_completion_tokens: 2000,
+      max_completion_tokens: 4000,
     });
 
     console.log("OpenAI API response received");
@@ -257,12 +257,13 @@ export async function generateChatResponse(request: ChatRequest): Promise<string
     const finishReason = completion.choices[0]?.finish_reason;
     
     if (!response) {
-      if (finishReason === 'length') {
-        console.error("Response truncated due to token limit");
-        throw new Error("応答がトークン制限により切り捨てられました。会話を短くしてください。");
-      }
       console.error("No response content in completion:", JSON.stringify(completion));
       throw new Error("AIからの応答がありませんでした。もう一度お試しください。");
+    }
+    
+    // If response was truncated, still return what we have
+    if (finishReason === 'length') {
+      console.log("Response was truncated but returning partial content");
     }
 
     console.log("Response generated successfully");
