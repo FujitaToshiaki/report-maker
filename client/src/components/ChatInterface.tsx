@@ -10,7 +10,7 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import masuoAvatar from "@assets/stock_images/friendly_mature_japa_e8e63f4f.jpg";
+import masuoAvatar from "@assets/stock_images/friendly_japanese_bu_6dcbfb05.jpg";
 import ayaAvatar from "@assets/stock_images/young_japanese_woman_c4b45ecb.jpg";
 import kenjiAvatar from "@assets/stock_images/japanese_business_ma_e2c8ac52.jpg";
 import yumiAvatar from "@assets/stock_images/young_japanese_woman_c4b45ecb.jpg";
