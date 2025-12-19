@@ -4,9 +4,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 import { useLocation } from "wouter";
-import masuoAvatar from "@assets/stock_images/friendly_japanese_bu_6dcbfb05.jpg";
-import ayaAvatar from "@assets/stock_images/young_japanese_woman_c4b45ecb.jpg";
-import kenjiAvatar from "@assets/stock_images/japanese_business_ma_e2c8ac52.jpg";
+import masuoAvatar from "@assets/stock_images/friendly_smiling_jap_85bc98b0.jpg";
+import ayaAvatar from "@assets/stock_images/cheerful_young_japan_b2b55419.jpg";
+import kenjiAvatar from "@assets/stock_images/japanese_business_ma_5e330df8.jpg";
 
 const characters = [
   {

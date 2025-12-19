@@ -5,9 +5,9 @@ import { CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-import takeshiAvatar from "@assets/stock_images/mature_japanese_trai_00e627f8.jpg";
-import sayuriAvatar from "@assets/stock_images/japanese_woman_in_he_1bb5ca4e.jpg";
-import kojiAvatar from "@assets/stock_images/young_japanese_man_f_a4b73fdf.jpg";
+import takeshiAvatar from "@assets/stock_images/japanese_male_teache_13814af9.jpg";
+import sayuriAvatar from "@assets/stock_images/professional_japanes_b2172ef2.jpg";
+import kojiAvatar from "@assets/stock_images/young_japanese_man_n_b1abe3d7.jpg";
 
 const characters = [
   {

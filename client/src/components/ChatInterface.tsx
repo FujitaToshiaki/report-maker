@@ -10,11 +10,15 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import masuoAvatar from "@assets/stock_images/friendly_japanese_bu_6dcbfb05.jpg";
-import ayaAvatar from "@assets/stock_images/young_japanese_woman_c4b45ecb.jpg";
-import kenjiAvatar from "@assets/stock_images/japanese_business_ma_e2c8ac52.jpg";
-import yumiAvatar from "@assets/stock_images/young_japanese_woman_c4b45ecb.jpg";
-import takashiAvatar from "@assets/stock_images/japanese_business_ma_e2c8ac52.jpg";
+import masuoAvatar from "@assets/stock_images/friendly_smiling_jap_85bc98b0.jpg";
+import ayaAvatar from "@assets/stock_images/cheerful_young_japan_b2b55419.jpg";
+import kenjiAvatar from "@assets/stock_images/japanese_business_ma_5e330df8.jpg";
+import masaruAvatar from "@assets/stock_images/japanese_quality_con_bc79927c.jpg";
+import yumiAvatar from "@assets/stock_images/japanese_woman_quali_ddc78719.jpg";
+import takashiAvatar from "@assets/stock_images/young_japanese_male__b682ba4c.jpg";
+import takeshiAvatar from "@assets/stock_images/japanese_male_teache_13814af9.jpg";
+import sayuriAvatar from "@assets/stock_images/professional_japanes_b2172ef2.jpg";
+import kojiAvatar from "@assets/stock_images/young_japanese_man_n_b1abe3d7.jpg";
 
 interface Message {
   id: string;
@@ -49,7 +53,7 @@ const characterData = {
   masaru: {
     name: "まさる課長",
     role: "品質管理ベテラン",
-    avatar: masuoAvatar,
+    avatar: masaruAvatar,
     initialMessage: "で、どんな不良やったがけ？詳しく教えてくれんけ。",
   },
   yumi: {
@@ -63,6 +67,24 @@ const characterData = {
     role: "設備保全担当",
     avatar: takashiAvatar,
     initialMessage: "不良の報告やね。まず、どんな不良やったがけ？",
+  },
+  takeshi: {
+    name: "たけし先生",
+    role: "研修講師",
+    avatar: takeshiAvatar,
+    initialMessage: "セミナーお疲れさまでした！どんな内容やったがけ？",
+  },
+  sayuri: {
+    name: "さゆり主任",
+    role: "人事担当",
+    avatar: sayuriAvatar,
+    initialMessage: "セミナー参加お疲れさまでした！どんな学びがあったがけ？",
+  },
+  koji: {
+    name: "こうじ君",
+    role: "新入社員",
+    avatar: kojiAvatar,
+    initialMessage: "セミナー行ってきたがね！どんな感じやったがけ？",
   },
 };
 

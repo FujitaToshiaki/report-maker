@@ -4,16 +4,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 import { useLocation } from "wouter";
-import masuoAvatar from "@assets/stock_images/friendly_mature_japa_e8e63f4f.jpg";
-import yumiAvatar from "@assets/stock_images/young_japanese_woman_c4b45ecb.jpg";
-import takashiAvatar from "@assets/stock_images/japanese_business_ma_e2c8ac52.jpg";
+import masaruAvatar from "@assets/stock_images/japanese_quality_con_bc79927c.jpg";
+import yumiAvatar from "@assets/stock_images/japanese_woman_quali_ddc78719.jpg";
+import takashiAvatar from "@assets/stock_images/young_japanese_male__b682ba4c.jpg";
 
 const characters = [
   {
     id: "masaru",
     name: "まさる課長",
     role: "50代品質管理ベテラン",
-    avatar: masuoAvatar,
+    avatar: masaruAvatar,
     description: "冷静沈着な分析者、5Why分析の誘導役",
     sample: "「で、どんな不良やったがけ？」",
     color: "border-primary",
