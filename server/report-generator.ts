@@ -1,9 +1,8 @@
 import OpenAI from "openai";
 
-// Using Replit AI Integrations - no API key required, charges billed to Replit credits
+// Using user's own OpenAI API key
 const openai = new OpenAI({
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
-  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 interface Message {
