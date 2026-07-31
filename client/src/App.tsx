@@ -28,6 +28,8 @@ import SeminarReportDetail from "@/pages/SeminarReportDetail";
 import DefectReportDetail from "@/pages/DefectReportDetail";
 import SettingsPage from "@/pages/SettingsPage";
 import HelpPage from "@/pages/HelpPage";
+import VoicePage from "@/pages/VoicePage";
+import VoicePreviewPage from "@/pages/VoicePreviewPage";
 
 function Router() {
   return (
@@ -61,6 +63,10 @@ function Router() {
       <Route path="/seminar/chat" component={ChatPage} />
       <Route path="/seminar/preview" component={SeminarReportPreviewPage} />
       
+      {/* Voice Routes */}
+      <Route path="/voice" component={VoicePage} />
+      <Route path="/voice/preview" component={VoicePreviewPage} />
+
       {/* Legacy routes for compatibility */}
       <Route path="/basic-info" component={BasicInfoPage} />
       <Route path="/character-selection" component={CharacterSelectionPage} />

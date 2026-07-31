@@ -1,4 +1,4 @@
-import { FileText, AlertTriangle, GraduationCap, LayoutDashboard, Settings, HelpCircle } from "lucide-react";
+import { FileText, AlertTriangle, GraduationCap, LayoutDashboard, Settings, HelpCircle, Mic } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -17,6 +17,11 @@ const menuItems = [
     title: "ダッシュボード",
     url: "/",
     icon: LayoutDashboard,
+  },
+  {
+    title: "🎙️ 音声で作成",
+    url: "/voice",
+    icon: Mic,
   },
   {
     title: "出張報告書",

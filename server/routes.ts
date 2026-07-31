@@ -1,8 +1,10 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { WebSocketServer } from "ws";
 import { storage } from "./storage";
 import { generateChatResponse } from "./chat";
 import { generateReport } from "./report-generator";
+import { setupVoiceChat } from "./voice-chat";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Chat API endpoint
@@ -60,6 +62,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   const httpServer = createServer(app);
+
+  // WebSocket server for voice chat (path: /ws/voice-chat)
+  const wss = new WebSocketServer({ noServer: true });
+  setupVoiceChat(wss);
+
+  httpServer.on("upgrade", (request, socket, head) => {
+    if (request.url === "/ws/voice-chat") {
+      wss.handleUpgrade(request, socket, head, (ws) => {
+        wss.emit("connection", ws, request);
+      });
+    } else {
+      socket.destroy();
+    }
+  });
 
   return httpServer;
 }

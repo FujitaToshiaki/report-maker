@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes voice-bar {
+  0%, 100% { height: 4px; }
+  50% { height: 28px; }
+}
+
+.animate-voice-bar {
+  animation: voice-bar 0.9s ease-in-out infinite;
+}
+
 /* LIGHT MODE */
 :root {
   --button-outline: rgba(0,0,0, .10);

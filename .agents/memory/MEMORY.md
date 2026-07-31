@@ -1,0 +1,1 @@
+- [Realtime API voice relay](realtime-voice-relay.md) — server relays browser WS ↔ OpenAI Realtime WS; AudioContext must be 24kHz; PCM16 base64 both directions.
