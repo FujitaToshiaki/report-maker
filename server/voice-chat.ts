@@ -3,7 +3,7 @@ import { IncomingMessage } from "http";
 import { generateReport } from "./report-generator";
 
 const OPENAI_REALTIME_URL =
-  "wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17";
+  "wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview";
 
 const VOICE_SYSTEM_PROMPT = `あなたは富山弁を話す報告書作成AIアシスタントです。音声だけで報告書に必要なすべての情報を収集します。
 
@@ -71,10 +71,16 @@ export function setupVoiceChat(wss: WebSocketServer) {
     let currentAssistantText = "";
 
     // Connect to OpenAI Realtime API
+    const apiKey = process.env.OPENAI_API_KEY || process.env.OPENAI_API;
+    if (!apiKey) {
+      sendToBrowser({ type: "error", message: "OpenAI APIキーが設定されていません。管理者に連絡してください。" });
+      browserWs.close();
+      return;
+    }
+
     const openaiWs = new WebSocket(OPENAI_REALTIME_URL, {
       headers: {
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-        "OpenAI-Beta": "realtime=v1",
+        Authorization: `Bearer ${apiKey}`,
       },
     });
 
