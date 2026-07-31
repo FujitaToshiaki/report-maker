@@ -72,21 +72,29 @@ interface Transcript {
   content: string;
 }
 
-function buildSessionConfig() {
+function buildSessionConfig(model: string) {
   return {
     type: "session.update",
     session: {
-      modalities: ["text", "audio"],
+      type: "realtime",
+      model,
+      output_modalities: ["audio"],
       instructions: VOICE_SYSTEM_PROMPT,
-      voice: "shimmer",
-      input_audio_format: "pcm16",
-      output_audio_format: "pcm16",
-      input_audio_transcription: { model: "whisper-1" },
-      turn_detection: {
-        type: "server_vad",
-        threshold: 0.5,
-        prefix_padding_ms: 300,
-        silence_duration_ms: 600,
+      audio: {
+        input: {
+          format: { type: "audio/pcm", rate: 24000 },
+          transcription: { model: "whisper-1" },
+          turn_detection: {
+            type: "server_vad",
+            threshold: 0.5,
+            prefix_padding_ms: 300,
+            silence_duration_ms: 600,
+          },
+        },
+        output: {
+          format: { type: "audio/pcm", rate: 24000 },
+          voice: "shimmer",
+        },
       },
       tools: [
         {
@@ -120,7 +128,7 @@ function buildSessionConfig() {
         },
       ],
       tool_choice: "auto",
-      max_response_output_tokens: 1024,
+      max_output_tokens: 1024,
     },
   };
 }
@@ -177,7 +185,7 @@ export function setupVoiceChat(wss: WebSocketServer) {
 
       openaiWs.on("open", () => {
         console.log(`[VoiceChat] Connected — model: ${model}`);
-        sendToOpenAI(buildSessionConfig());
+        sendToOpenAI(buildSessionConfig(model));
 
         // Trigger AI to speak first
         sendToOpenAI({
@@ -193,7 +201,7 @@ export function setupVoiceChat(wss: WebSocketServer) {
             ],
           },
         });
-        sendToOpenAI({ type: "response.create", response: { modalities: ["text", "audio"] } });
+        sendToOpenAI({ type: "response.create" });
       });
 
       openaiWs.on("message", async (data) => {
@@ -202,15 +210,18 @@ export function setupVoiceChat(wss: WebSocketServer) {
 
           switch (event.type) {
             case "response.audio.delta":
+            case "response.output_audio.delta":
               sendToBrowser({ type: "audio", delta: event.delta });
               break;
 
             case "response.audio_transcript.delta":
+            case "response.output_audio_transcript.delta":
               currentAssistantText += event.delta;
               sendToBrowser({ type: "transcript_delta", role: "assistant", delta: event.delta });
               break;
 
             case "response.audio_transcript.done":
+            case "response.output_audio_transcript.done":
               transcript.push({ role: "assistant", content: event.transcript || currentAssistantText });
               currentAssistantText = "";
               sendToBrowser({ type: "transcript_done", role: "assistant", text: event.transcript || "" });
