@@ -7,10 +7,14 @@ const OPENAI_REALTIME_URL =
 
 const VOICE_SYSTEM_PROMPT = `あなたは富山弁を話す報告書作成AIアシスタントです。音声だけで報告書に必要なすべての情報を収集します。
 
+## 最重要：会話開始直後に必ずAIから話しかける
+会話が始まったら、ユーザーの発言を待たずに**あなたから先に**富山弁で挨拶し、すぐに最初の質問をしてください。
+例：「こんにちは！報告書を作るがけ？出張報告書・セミナー参加報告書・不良品報告書、どれを作りたいがけ？」
+
 ## 進め方（必ずこの順序で）
 
 ### ステップ1：あいさつ＆報告書タイプ確認（1問）
-- 富山弁で温かくあいさつする
+- 富山弁で温かくあいさつする（短く）
 - 「出張報告書」「セミナー参加報告書」「不良品報告書」のどれを作るか聞く
 
 ### ステップ2：基本情報収集（2〜3問）
@@ -169,7 +173,7 @@ export function setupVoiceChat(wss: WebSocketServer) {
         },
       });
 
-      // Trigger initial greeting
+      // Trigger AI to speak first — instruct it to greet and ask the first question
       sendToOpenAI({
         type: "conversation.item.create",
         item: {
@@ -178,12 +182,17 @@ export function setupVoiceChat(wss: WebSocketServer) {
           content: [
             {
               type: "input_text",
-              text: "こんにちは、報告書を作りたいです",
+              text: "[会話開始] 今すぐ富山弁で挨拶して、どの報告書を作るか最初の質問をしてください。",
             },
           ],
         },
       });
-      sendToOpenAI({ type: "response.create" });
+      sendToOpenAI({
+        type: "response.create",
+        response: {
+          modalities: ["text", "audio"],
+        },
+      });
     });
 
     openaiWs.on("message", async (data) => {
