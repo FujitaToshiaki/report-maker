@@ -4,10 +4,8 @@ import { generateReport } from "./report-generator";
 
 // GA Realtime API models to try in order (first accessible wins)
 const REALTIME_MODELS = [
-  "gpt-4o-realtime-preview-2024-12-17",
-  "gpt-4o-mini-realtime-preview-2024-12-17",
-  "gpt-4o-realtime-preview",
-  "gpt-4o-mini-realtime-preview",
+  "gpt-realtime",
+  "gpt-realtime-mini",
 ];
 
 const OPENAI_REALTIME_BASE = "wss://api.openai.com/v1/realtime";
